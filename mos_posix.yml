@@ -1,0 +1,8 @@
+sources:
+  - src/posix
+
+build_vars:
+  MGOS_ENABLE_I2C_GPIO: 0
+
+config_schema:
+  - ["i2c.bus_no", "i", 0, {title: "I2C system bus number"}]

@@ -1,0 +1,33 @@
+author: mongoose-os
+description: I2C
+type: lib
+version: 1.0
+
+sources:
+  - src
+
+build_vars:
+  MGOS_ENABLE_I2C_GPIO: 0
+
+config_schema:
+  - ["i2c", "o", {title: "I2C settings"}]
+  - ["i2c.enable", "b", false, {title: "Enable I2C"}]
+  - ["i2c.freq", "i", 100000, {title: "Clock frequency"}]
+  - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
+
+conds:
+  - when: build_vars.MGOS_ENABLE_I2C_GPIO == "1"
+    apply:
+      sources:
+        - src/common_gpio
+
+      config_schema:
+        - ["i2c.sda_gpio", "i", 0, {title: "GPIO to use for SDA"}]
+        - ["i2c.scl_gpio", "i", 0, {title: "GPIO to use for SCL"}]
+
+tags:
+  - c
+  - i2c
+  - js
+
+skeleton_version: 2017-06-16
