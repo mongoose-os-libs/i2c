@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "fw/src/mgos_hal.h"
+#include "mgos_hal.h"
 
 struct mgos_i2c {
   int fd;

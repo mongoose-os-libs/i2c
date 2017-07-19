@@ -16,7 +16,7 @@
 #include "soc/i2c_reg.h"
 #include "soc/i2c_struct.h"
 
-#include "fw/src/mgos_sys_config.h"
+#include "mgos_sys_config.h"
 
 #include "common/cs_dbg.h"
 

@@ -3,7 +3,7 @@
  * All rights reserved
  */
 
-#include "fw/src/mgos_features.h"
+#include "mgos_features.h"
 
 #include <stdbool.h>
 #include <stdint.h>
