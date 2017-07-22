@@ -1,5 +1,5 @@
 author: mongoose-os
-description: I2C
+description: Implements SPI API on Mongoose OS
 type: lib
 version: 1.0
 
