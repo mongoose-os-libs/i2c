@@ -8,4 +8,4 @@ conds:
         - ["i2c.sda_gpio", 12]
         - ["i2c.scl_gpio", 14]
 
-skeleton_version: 2017-06-16
+manifest_version: 2017-06-16
