@@ -5,9 +5,9 @@ let I2C = {
   // ## **`I2C.get()`**
   // Get I2C bus handle. Return value: opaque pointer.
   get: ffi('void *mgos_i2c_get_global(void)'),
-  get_default: ffi('void *mgos_i2c_get_global(void)'), // deprecated
+  get_default: ffi('void *mgos_i2c_get_global(void)'),  // deprecated
 
-  // ## **`I2C.close()`**
+  // ## **`I2C.close(handle)`**
   // Close I2C handle. Return value: none.
   close: ffi('void mgos_i2c_close(void *conn)'),
 
