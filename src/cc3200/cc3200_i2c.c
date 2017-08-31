@@ -23,8 +23,6 @@
 #include "rom.h"
 #include "rom_map.h"
 
-#include "config.h"
-
 /* Documentation: TRM (swru367b), Chapter 7 */
 
 #ifdef CC3200_I2C_DEBUG
