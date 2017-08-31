@@ -10,18 +10,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "oslib/osi.h"
+
+#include "inc/hw_types.h"
+#include "inc/hw_i2c.h"
+#include "inc/hw_memmap.h"
+#include "driverlib/i2c.h"
+#include "driverlib/pin.h"
+#include "driverlib/prcm.h"
+#include "driverlib/rom.h"
+#include "driverlib/rom_map.h"
 
 #include "mgos_i2c.h"
-
-#include "hw_types.h"
-#include "hw_memmap.h"
-#include "hw_i2c.h"
-#include "i2c.h"
-#include "pin.h"
-#include "prcm.h"
-#include "rom.h"
-#include "rom_map.h"
 
 /* Documentation: TRM (swru367b), Chapter 7 */
 
@@ -133,7 +132,7 @@ static bool cc3200_i2c_command(struct mgos_i2c *c, uint32_t cmd) {
   dprintf(("-- cmd %02x\n", cmd));
   // I2CMasterTimeoutSet(c->base, 0x20); /* 5 ms @ 100 KHz */
   MAP_I2CMasterIntClearEx(I2CA0_BASE, I2C_INT_MASTER);
-  I2CMasterControl(c->base, cmd);
+  MAP_I2CMasterControl(c->base, cmd);
   while (!(MAP_I2CMasterIntStatusEx(I2CA0_BASE, false) & I2C_INT_MASTER)) {
   }
   volatile uint32_t mcs = HWREG(c->base + I2C_O_MCS);

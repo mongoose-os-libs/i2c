@@ -1,4 +1,3 @@
-
 conds:
   - when: build_vars.MGOS_ENABLE_I2C_GPIO != "1"
     apply:
@@ -13,5 +12,3 @@ conds:
       config_schema:
         - ["i2c.sda_gpio", 2]
         - ["i2c.scl_gpio", 1]
-
-manifest_version: 2017-06-16
