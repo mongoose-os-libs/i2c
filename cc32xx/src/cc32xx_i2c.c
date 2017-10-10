@@ -56,7 +56,7 @@ bool mgos_i2c_set_freq(struct mgos_i2c *c, int freq) {
   return true;
 }
 
-struct mgos_i2c *mgos_i2c_create(const struct sys_config_i2c *cfg) {
+struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
   struct mgos_i2c *c = (struct mgos_i2c *) calloc(1, sizeof(*c));
   if (c == NULL) return NULL;
 

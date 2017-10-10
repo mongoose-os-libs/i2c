@@ -282,7 +282,7 @@ bool mgos_i2c_set_freq(struct mgos_i2c *c, int freq) {
   return true;
 }
 
-struct mgos_i2c *mgos_i2c_create(const struct sys_config_i2c *cfg) {
+struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
   struct mgos_i2c *c = NULL;
   if (cfg->sda_gpio < 0 || cfg->sda_gpio > 34 || cfg->scl_gpio < 0 ||
       cfg->scl_gpio > 34 || (cfg->unit_no != 0 && cfg->unit_no != 1) ||

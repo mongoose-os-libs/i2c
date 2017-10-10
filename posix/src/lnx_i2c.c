@@ -48,7 +48,7 @@ int lnx_i2c_write_shim(int fd, uint8_t *buf, size_t buf_size) {
   return ret;
 }
 
-struct mgos_i2c *mgos_i2c_create(const struct sys_config_i2c *cfg) {
+struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
   char bus_name[50];
   struct mgos_i2c *c = NULL;
 

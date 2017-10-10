@@ -28,7 +28,7 @@ extern "C" {
 struct mgos_i2c;
 
 /* Initialize I2C master */
-struct mgos_i2c *mgos_i2c_create(const struct sys_config_i2c *cfg);
+struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg);
 
 /* If this special address is passed to read or write, START is not generated
  * and address is not put on the bus. It is assumed that this is a continuation

@@ -55,9 +55,8 @@ bool mgos_i2c_write_reg_n(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
 }
 
 bool mgos_i2c_init(void) {
-  const struct sys_config_i2c *cfg = &get_cfg()->i2c;
-  if (!cfg->enable) return true;
-  s_global_i2c = mgos_i2c_create(cfg);
+  if (!mgos_sys_config_get_i2c_enable()) return true;
+  s_global_i2c = mgos_i2c_create(mgos_sys_config_get_i2c());
   return (s_global_i2c != NULL);
 }
 
