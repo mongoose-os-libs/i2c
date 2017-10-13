@@ -4,9 +4,9 @@
  */
 
 /*
- * See on GitHub:
- * [mgos_i2c.h](https://github.com/mongoose-os-libs/i2c/blob/master/src/mgos_i2c.h),
- * [mgos_i2c.c](https://github.com/mongoose-os-libs/i2c/blob/master/src/mgos_i2c.c)
+ * I2C API.
+ *
+ * See https://en.wikipedia.org/wiki/I%C2%B2C for the background information.
  */
 
 #ifndef CS_FW_SRC_MGOS_I2C_H_
@@ -99,6 +99,7 @@ bool mgos_i2c_write_reg_n(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
 /* Close i2c connection and free resources. */
 void mgos_i2c_close(struct mgos_i2c *conn);
 
+/* Return i2c bus handle that is set up via the sysconfig. */
 struct mgos_i2c *mgos_i2c_get_global(void);
 
 bool mgos_i2c_init(void);
