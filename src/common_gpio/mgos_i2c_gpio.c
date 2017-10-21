@@ -111,8 +111,8 @@ static enum i2c_ack_type mgos_i2c_send_byte(struct mgos_i2c *c, uint8_t data) {
   int i, bit;
 
   set_gpio_val(c->scl_gpio, I2C_LOW);
-  for (i = 0; i < 8; i++, data <<= 1) {
-    bit = (data & 0x80) ? 1 : 0;
+  for (i = 0; i < 8; i++) {
+    bit = (data & (1 << (7 - i))) ? 1 : 0;
     mgos_i2c_set_sda_scl(c, bit, I2C_HIGH);
     mgos_i2c_half_delay(c);
     set_gpio_val(c->scl_gpio, I2C_LOW);
