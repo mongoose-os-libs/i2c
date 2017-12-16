@@ -27,7 +27,24 @@ extern "C" {
 /* Each platform defines its own I2C connection parameters. */
 struct mgos_i2c;
 
-/* Initialize I2C master */
+/*
+ * Initialize I2C master with the given params. Typically clients don't need to
+ * do that manually: mgos has a global I2C instance created with the params
+ * given in system config, use `mgos_i2c_get_global()` to get the global
+ * instance.
+ *
+ * Example:
+ * ```c
+ * const struct mgos_config_i2c cfg = {
+ *   .enable = true,
+ *   .freq: 400,
+ *   .debug: 0,
+ *   .sda_gpio: 13,
+ *   .scl_gpio: 12,
+ * };
+ * struct mgos_i2c *myi2c = mgos_i2c_create(&cfg);
+ * ```
+ */
 struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg);
 
 /* If this special address is passed to read or write, START is not generated
@@ -74,25 +91,49 @@ int mgos_i2c_get_freq(struct mgos_i2c *i2c);
 bool mgos_i2c_set_freq(struct mgos_i2c *i2c, int freq);
 
 /*
- * Register read/write routines.
- * These are helpers for reading register values from a device.
- * First a 1-byte write of a register address is performed, followed by either
- * a byte or a word (2 bytes) data read/write.
- * For word operations, value is big-endian: for a read, first byte read from
- * the bus is in bits 15-8, second is in bits 7-0; for a write, bits 15-8 are
- * put on the us first, followed by bits 7-0.
- * Read operations return negative number on error and positive value in the
- * respective range (0-255, 0-65535) on success.
+ * Helper for reading 1-byte register `reg` from a device at address `addr`.
+ * In case of success return a numeric byte value from 0x00 to 0xff; otherwise
+ * return -1.
  */
 int mgos_i2c_read_reg_b(struct mgos_i2c *conn, uint16_t addr, uint8_t reg);
+
+/*
+ * Helper for reading 2-byte register `reg` from a device at address `addr`.
+ * In case of success returns a numeric big-endian value: e.g. if 0x01, 0x02
+ * was read from a device, 0x0102 will be returned.
+ *
+ * In case of error returns -1.
+ */
 int mgos_i2c_read_reg_w(struct mgos_i2c *conn, uint16_t addr, uint8_t reg);
+
+/*
+ * Helper for reading `n`-byte register value from a device. Returns true on
+ * success, false on error. Data is written to `buf`, which should be large
+ * enough.
+ */
 bool mgos_i2c_read_reg_n(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
                          size_t n, uint8_t *buf);
 
+/*
+ * Helper for writing 1-byte register `reg` to a device at address `addr`.
+ * Returns `true` in case of success, `false` otherwise.
+ */
 bool mgos_i2c_write_reg_b(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
                           uint8_t value);
+
+/*
+ * Helper for writing 2-byte register `reg` to a device at address `addr`.
+ * The value is big-endian: e.g. if `value` is `0x0102`, then `0x01, 0x02`
+ * will be written.
+ * Returns `true` in case of success, `false` otherwise.
+ */
 bool mgos_i2c_write_reg_w(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
                           uint16_t value);
+
+/*
+ * Helper for writing `n`-byte register `reg` to a device at address `addr`.
+ * Returns `true` in case of success, `false` otherwise.
+ */
 bool mgos_i2c_write_reg_n(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
                           size_t n, const uint8_t *buf);
 
@@ -101,8 +142,6 @@ void mgos_i2c_close(struct mgos_i2c *conn);
 
 /* Return i2c bus handle that is set up via the sysconfig. */
 struct mgos_i2c *mgos_i2c_get_global(void);
-
-bool mgos_i2c_init(void);
 
 #ifdef __cplusplus
 }
