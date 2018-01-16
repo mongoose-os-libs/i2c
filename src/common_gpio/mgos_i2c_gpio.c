@@ -19,14 +19,9 @@
 struct mgos_i2c {
   int sda_gpio;
   int scl_gpio;
-  unsigned int started : 1;
-  unsigned int debug : 1;
-};
-
-enum i2c_gpio_val {
-  I2C_LOW = 0,
-  I2C_HIGH = 1,
-  I2C_INPUT = 2,
+  int freq, half_delay_n100;
+  bool started;
+  bool debug;
 };
 
 enum i2c_ack_type {
@@ -42,28 +37,7 @@ enum i2c_rw {
 
 /* This function delays for half of a SCL pulse, i.e. quarter of a period. */
 static inline void mgos_i2c_half_delay(struct mgos_i2c *c) {
-  (void) c;
-  /* This is ~100 KHz on ESP8266, ~112 KHz on ESP32. */
-  (mgos_nsleep100)(23);
-}
-
-static void set_gpio_val(int pin, uint8_t val) {
-  switch (val) {
-    case I2C_LOW:
-    case I2C_HIGH:
-      mgos_gpio_set_mode(pin, MGOS_GPIO_MODE_OUTPUT);
-      mgos_gpio_write(pin, (val == I2C_HIGH));
-      break;
-    case I2C_INPUT:
-      mgos_gpio_set_mode(pin, MGOS_GPIO_MODE_INPUT);
-      break;
-  }
-}
-
-static inline void mgos_i2c_set_sda_scl(struct mgos_i2c *c, uint8_t sda_val,
-                                        uint8_t scl_val) {
-  set_gpio_val(c->sda_gpio, sda_val);
-  set_gpio_val(c->scl_gpio, scl_val);
+  (mgos_nsleep100)(c->half_delay_n100);
 }
 
 static enum i2c_ack_type mgos_i2c_send_byte(struct mgos_i2c *c, uint8_t data);
@@ -79,11 +53,12 @@ static enum i2c_ack_type mgos_i2c_start(struct mgos_i2c *c, uint16_t addr,
   if (addr > 0x7F || (mode != I2C_READ && mode != I2C_WRITE)) {
     return I2C_ERR;
   }
-  mgos_i2c_set_sda_scl(c, I2C_HIGH, I2C_HIGH);
+  mgos_gpio_write(c->sda_gpio, 1);
+  mgos_gpio_write(c->scl_gpio, 1);
   mgos_i2c_half_delay(c);
-  mgos_i2c_set_sda_scl(c, I2C_LOW, I2C_HIGH);
+  mgos_gpio_write(c->sda_gpio, 0);
   mgos_i2c_half_delay(c);
-  mgos_i2c_set_sda_scl(c, I2C_LOW, I2C_LOW);
+  mgos_gpio_write(c->scl_gpio, 0);
   mgos_i2c_half_delay(c);
   result = mgos_i2c_send_byte(c, address_byte);
   c->started = 1;
@@ -93,12 +68,10 @@ static enum i2c_ack_type mgos_i2c_start(struct mgos_i2c *c, uint16_t addr,
 
 void mgos_i2c_stop(struct mgos_i2c *c) {
   if (!c->started) return;
-  mgos_i2c_set_sda_scl(c, I2C_LOW, I2C_LOW);
   mgos_i2c_half_delay(c);
-  mgos_i2c_set_sda_scl(c, I2C_LOW, I2C_HIGH);
+  mgos_gpio_write(c->scl_gpio, 1);
   mgos_i2c_half_delay(c);
-  mgos_i2c_set_sda_scl(c, I2C_HIGH, I2C_HIGH);
-  mgos_i2c_set_sda_scl(c, I2C_INPUT, I2C_INPUT);
+  mgos_gpio_write(c->sda_gpio, 1);
   mgos_i2c_half_delay(c);
   c->started = false;
   if (c->debug) {
@@ -110,20 +83,26 @@ static enum i2c_ack_type mgos_i2c_send_byte(struct mgos_i2c *c, uint8_t data) {
   enum i2c_ack_type ret_val;
   int i, bit;
 
-  set_gpio_val(c->scl_gpio, I2C_LOW);
+  mgos_gpio_write(c->scl_gpio, 0);
+  mgos_i2c_half_delay(c);
   for (i = 0; i < 8; i++) {
     bit = (data & (1 << (7 - i))) ? 1 : 0;
-    mgos_i2c_set_sda_scl(c, bit, I2C_HIGH);
+    mgos_gpio_write(c->sda_gpio, bit);
+    mgos_gpio_write(c->scl_gpio, 1);
     mgos_i2c_half_delay(c);
-    set_gpio_val(c->scl_gpio, I2C_LOW);
+    mgos_gpio_write(c->scl_gpio, 0);
     mgos_i2c_half_delay(c);
   }
   /* release the bus for slave to write ack */
-  mgos_i2c_set_sda_scl(c, I2C_INPUT, I2C_HIGH);
+  mgos_gpio_write(c->sda_gpio, 1);
+  mgos_gpio_set_mode(c->sda_gpio, MGOS_GPIO_MODE_INPUT);
+  mgos_gpio_write(c->scl_gpio, 1);
   mgos_i2c_half_delay(c);
   ret_val = mgos_gpio_read(c->sda_gpio);
+  mgos_gpio_write(c->scl_gpio, 0);
   mgos_i2c_half_delay(c);
-  mgos_i2c_set_sda_scl(c, I2C_INPUT, I2C_LOW);
+  mgos_gpio_write(c->sda_gpio, 0);
+  mgos_gpio_set_mode(c->sda_gpio, MGOS_GPIO_MODE_OUTPUT_OD);
   if (c->debug) {
     LOG(LL_DEBUG,
         (" sent 0x%02x, recd %s", data, (ret_val == I2C_ACK ? "ACK" : "NAK")));
@@ -131,33 +110,29 @@ static enum i2c_ack_type mgos_i2c_send_byte(struct mgos_i2c *c, uint8_t data) {
   return ret_val;
 }
 
-static void mgos_i2c_send_ack(struct mgos_i2c *c, enum i2c_ack_type ack_type) {
-  mgos_i2c_set_sda_scl(c, ack_type, I2C_LOW);
-  mgos_i2c_half_delay(c);
-  mgos_i2c_set_sda_scl(c, ack_type, I2C_HIGH);
-  mgos_i2c_half_delay(c);
-  mgos_i2c_half_delay(c);
-  mgos_i2c_set_sda_scl(c, ack_type, I2C_LOW);
-  mgos_i2c_half_delay(c);
-}
-
 static uint8_t mgos_i2c_read_byte(struct mgos_i2c *c,
                                   enum i2c_ack_type ack_type) {
   uint8_t i, ret_val = 0;
 
-  mgos_i2c_set_sda_scl(c, I2C_INPUT, I2C_LOW);
+  mgos_gpio_write(c->scl_gpio, 0);
+  mgos_gpio_set_mode(c->sda_gpio, MGOS_GPIO_MODE_INPUT);
   mgos_i2c_half_delay(c);
-
   for (i = 0; i < 8; i++) {
     uint8_t bit;
-    mgos_i2c_set_sda_scl(c, I2C_INPUT, I2C_HIGH);
+    mgos_gpio_write(c->scl_gpio, 1);
     mgos_i2c_half_delay(c);
     bit = mgos_gpio_read(c->sda_gpio);
     ret_val |= (bit << (7 - i));
-    mgos_i2c_set_sda_scl(c, I2C_INPUT, I2C_LOW);
+    mgos_gpio_write(c->scl_gpio, 0);
     mgos_i2c_half_delay(c);
   }
-  mgos_i2c_send_ack(c, ack_type);
+  mgos_gpio_write(c->sda_gpio, (ack_type == I2C_ACK ? 0 : 1));
+  mgos_gpio_set_mode(c->sda_gpio, MGOS_GPIO_MODE_OUTPUT_OD);
+  mgos_gpio_write(c->scl_gpio, 1);
+  mgos_i2c_half_delay(c);
+  mgos_gpio_write(c->scl_gpio, 0);
+  mgos_i2c_half_delay(c);
+  mgos_gpio_write(c->sda_gpio, 0);
   if (c->debug) {
     LOG(LL_DEBUG, (" recd 0x%02x, sent %s", ret_val,
                    (ack_type == I2C_ACK ? "ACK" : "NAK")));
@@ -220,13 +195,16 @@ out:
 }
 
 int mgos_i2c_get_freq(struct mgos_i2c *c) {
-  (void) c;
-  return MGOS_I2C_FREQ_100KHZ;
+  return c->freq;
 }
 
 bool mgos_i2c_set_freq(struct mgos_i2c *c, int freq) {
-  (void) c;
-  return (freq == MGOS_I2C_FREQ_100KHZ);
+  int half_delay_n100 = 10000000 / freq / 2;
+  half_delay_n100 -= 4; /* overhead */
+  if (half_delay_n100 <= 0) return false;
+  c->freq = freq;
+  c->half_delay_n100 = half_delay_n100;
+  return true;
 }
 
 struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
@@ -240,22 +218,23 @@ struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
   c->started = false;
   c->debug = cfg->debug;
 
-  /* We can barely do 100 KHz, sort of. */
-  if (cfg->freq != MGOS_I2C_FREQ_100KHZ) {
+  if (!mgos_i2c_set_freq(c, cfg->freq)) {
     goto out_err;
   }
 
-  if (!mgos_gpio_set_mode(c->sda_gpio, MGOS_GPIO_MODE_INPUT) ||
-      !mgos_gpio_set_pull(c->sda_gpio, MGOS_GPIO_PULL_UP)) {
+  mgos_gpio_write(c->sda_gpio, 1);
+  mgos_gpio_write(c->scl_gpio, 1);
+  if (!mgos_gpio_set_pull(c->sda_gpio, MGOS_GPIO_PULL_UP) ||
+      !mgos_gpio_set_mode(c->sda_gpio, MGOS_GPIO_MODE_OUTPUT_OD)) {
     goto out_err;
   }
-  if (!mgos_gpio_set_mode(c->scl_gpio, MGOS_GPIO_MODE_INPUT) ||
-      !mgos_gpio_set_pull(c->scl_gpio, MGOS_GPIO_PULL_UP)) {
+  if (!mgos_gpio_set_pull(c->scl_gpio, MGOS_GPIO_PULL_UP) ||
+      !mgos_gpio_set_mode(c->scl_gpio, MGOS_GPIO_MODE_OUTPUT_OD)) {
     goto out_err;
   }
 
-  LOG(LL_INFO,
-      ("I2C GPIO init ok (SDA: %d, SCL: %d)", c->sda_gpio, c->scl_gpio));
+  LOG(LL_INFO, ("I2C GPIO init ok (SDA: %d, SCL: %d, freq: %d)", c->sda_gpio,
+                c->scl_gpio, cfg->freq));
 
   return c;
 
