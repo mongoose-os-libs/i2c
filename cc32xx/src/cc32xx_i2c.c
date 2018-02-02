@@ -7,9 +7,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "inc/hw_types.h"
 #include "inc/hw_i2c.h"
@@ -19,6 +16,8 @@
 #include "driverlib/prcm.h"
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
+
+#include "common/cs_dbg.h"
 
 #include "mgos_i2c.h"
 
