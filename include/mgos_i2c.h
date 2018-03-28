@@ -36,7 +36,7 @@ struct mgos_i2c;
  * Example:
  * ```c
  * const struct mgos_config_i2c cfg = {
- *   .enable = true,
+ *   .enable: true,
  *   .freq: 400,
  *   .debug: 0,
  *   .sda_gpio: 13,
