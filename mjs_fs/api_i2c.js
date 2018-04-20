@@ -9,7 +9,7 @@ let I2C = {
 
   // ## **`I2C.close(handle)`**
   // Close I2C handle. Return value: none.
-  close: ffi('void mgos_i2c_close(void *conn)'),
+  close: ffi('void mgos_i2c_close(void *)'),
 
   // ## **`I2C.write(handle, addr, buf, size, stop)`**
   // Send a byte array to I2C.
