@@ -34,6 +34,7 @@ tags:
   - i2c
   - js
   - core
+  - docs:core:I2C
 
 manifest_version: 2017-09-29
 
