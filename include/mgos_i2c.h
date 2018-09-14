@@ -15,12 +15,6 @@
  * limitations under the License.
  */
 
-/*
- * I2C API.
- *
- * See https://en.wikipedia.org/wiki/I%C2%B2C for the background information.
- */
-
 #ifndef CS_FW_SRC_MGOS_I2C_H_
 #define CS_FW_SRC_MGOS_I2C_H_
 
