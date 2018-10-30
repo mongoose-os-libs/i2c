@@ -232,14 +232,7 @@ struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
     goto out_err;
   }
 
-  mgos_gpio_write(c->sda_gpio, 1);
-  mgos_gpio_write(c->scl_gpio, 1);
-  if (!mgos_gpio_set_pull(c->sda_gpio, MGOS_GPIO_PULL_UP) ||
-      !mgos_gpio_set_mode(c->sda_gpio, MGOS_GPIO_MODE_OUTPUT_OD)) {
-    goto out_err;
-  }
-  if (!mgos_gpio_set_pull(c->scl_gpio, MGOS_GPIO_PULL_UP) ||
-      !mgos_gpio_set_mode(c->scl_gpio, MGOS_GPIO_MODE_OUTPUT_OD)) {
+  if (!mgos_i2c_reset_bus(c->sda_gpio, c->scl_gpio)) {
     goto out_err;
   }
 

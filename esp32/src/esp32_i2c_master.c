@@ -353,6 +353,10 @@ struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
 
   memcpy(&c->cfg, cfg, sizeof(c->cfg));
 
+  if (!mgos_i2c_reset_bus(c->cfg.sda_gpio, c->cfg.scl_gpio)) {
+    goto out_err;
+  }
+
   if (cfg->unit_no == 0) {
     c->pm = PERIPH_I2C0_MODULE;
     c->dev = (i2c_dev_t *) ESP32_I2C0_AHB_BASE;

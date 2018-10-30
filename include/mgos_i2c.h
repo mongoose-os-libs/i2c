@@ -15,8 +15,7 @@
  * limitations under the License.
  */
 
-#ifndef CS_FW_SRC_MGOS_I2C_H_
-#define CS_FW_SRC_MGOS_I2C_H_
+#pragma once
 
 #include "mgos_features.h"
 
@@ -149,8 +148,10 @@ void mgos_i2c_close(struct mgos_i2c *conn);
 /* Return i2c bus handle that is set up via the sysconfig. */
 struct mgos_i2c *mgos_i2c_get_global(void);
 
+/* Init given pins as OD outputs and perform bus reset
+ * by sending dummy clocks. */
+bool mgos_i2c_reset_bus(int sda_gpio, int scl_gpio);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-#endif /* CS_FW_SRC_MGOS_I2C_H_ */

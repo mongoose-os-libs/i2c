@@ -17,6 +17,9 @@
 
 #include "mgos_i2c.h"
 
+#include "mgos_gpio.h"
+#include "mgos_hal.h"
+
 static struct mgos_i2c *s_global_i2c;
 
 int mgos_i2c_read_reg_b(struct mgos_i2c *conn, uint16_t addr, uint8_t reg) {
@@ -74,4 +77,39 @@ bool mgos_i2c_init(void) {
 
 struct mgos_i2c *mgos_i2c_get_global(void) {
   return s_global_i2c;
+}
+
+#define HALF_DELAY() (mgos_nsleep100)(100 / 2); /* 100 KHz */
+
+bool mgos_i2c_reset_bus(int sda_gpio, int scl_gpio) {
+  if (!mgos_gpio_setup_output(sda_gpio, 1) ||
+      !mgos_gpio_set_pull(sda_gpio, MGOS_GPIO_PULL_UP) ||
+      !mgos_gpio_set_mode(sda_gpio, MGOS_GPIO_MODE_OUTPUT_OD)) {
+    return false;
+  }
+  if (!mgos_gpio_setup_output(scl_gpio, 1) ||
+      !mgos_gpio_set_pull(scl_gpio, MGOS_GPIO_PULL_UP) ||
+      !mgos_gpio_set_mode(scl_gpio, MGOS_GPIO_MODE_OUTPUT_OD)) {
+    return false;
+  }
+
+  /*
+   * Send some dummy clocks to reset the bus.
+   * https://www.i2c-bus.org/i2c-primer/analysing-obscure-problems/blocked-bus/
+   */
+  HALF_DELAY();
+  HALF_DELAY();
+  for (int i = 0; i < 16; i++) {
+    mgos_gpio_write(scl_gpio, 0);
+    HALF_DELAY();
+    mgos_gpio_write(sda_gpio, 0);
+    HALF_DELAY();
+    mgos_gpio_write(scl_gpio, 1);
+    HALF_DELAY();
+    HALF_DELAY();
+  }
+  /* STOP condition. */
+  mgos_gpio_write(sda_gpio, 1);
+  HALF_DELAY();
+  return true;
 }

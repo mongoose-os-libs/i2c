@@ -75,6 +75,8 @@ struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
   int sda_pin = cfg->sda_pin - 1;
   int scl_pin = cfg->scl_pin - 1;
 
+  mgos_i2c_reset_bus(cfg->sda_pin, cfg->scl_pin);
+
   int mode;
   if (scl_pin == PIN_01) {
     mode = PIN_MODE_1;
