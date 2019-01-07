@@ -10,9 +10,6 @@ sources:
 includes:
   - include
 
-build_vars:
-  MGOS_ENABLE_I2C_GPIO: 0
-
 config_schema:
   - ["i2c", "o", {title: "I2C settings"}]
   - ["i2c.enable", "b", false, {title: "Enable I2C"}]
@@ -20,20 +17,51 @@ config_schema:
   - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
 
 conds:
-  - when: build_vars.MGOS_ENABLE_I2C_GPIO == "1"
+  - when: mos.platform == "cc3200"
     apply:
       sources:
-        - src/common_gpio
-
+        - src/cc32xx
       config_schema:
-        - ["i2c.sda_gpio", "i", 0, {title: "GPIO to use for SDA"}]
-        - ["i2c.scl_gpio", "i", 0, {title: "GPIO to use for SCL"}]
+        - ["i2c.sda_pin", "i", 2, {title: "Pin to use for SDA"}]
+        - ["i2c.scl_pin", "i", 1, {title: "Pin to use for SCL"}]
+
+  - when: mos.platform == "cc3220"
+    apply:
+      sources:
+        - src/cc32xx
+      config_schema:
+        - ["i2c.sda_pin", "i", 2, {title: "Pin to use for SDA"}]
+        - ["i2c.scl_pin", "i", 1, {title: "Pin to use for SCL"}]
+
+  - when: mos.platform == "esp32"
+    apply:
+      sources:
+        - src/esp32
+      config_schema:
+        - ["i2c.unit_no", "i", 0, {title: "Which hardware unit to use, 0 or 1"}]
+        - ["i2c.sda_gpio", "i", 32, {title: "GPIO to use for SDA"}]
+        - ["i2c.scl_gpio", "i", 33, {title: "GPIO to use for SCL"}]
+
+  - when: mos.platform == "esp8266"
+    apply:
+      sources:
+        - src/gpio
+      config_schema:
+        - ["i2c.sda_gpio", "i", 12, {title: "GPIO to use for SDA"}]
+        - ["i2c.scl_gpio", "i", 14, {title: "GPIO to use for SCL"}]
+
+  - when: mos.platform == "stm32"
+    apply:
+      sources:
+        - src/gpio
+      config_schema:
+        - ["i2c.sda_gpio", "i", -1, {title: "GPIO to use for SDA"}]
+        - ["i2c.scl_gpio", "i", -1, {title: "GPIO to use for SCL"}]
 
 tags:
   - c
+  - hw
   - i2c
-  - js
-  - core
   - docs:core:I2C
 
 manifest_version: 2018-06-20

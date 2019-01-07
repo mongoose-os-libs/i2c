@@ -1,3 +1,0 @@
-# Bitbang impl only, for now.
-build_vars:
-  MGOS_ENABLE_I2C_GPIO: 1
