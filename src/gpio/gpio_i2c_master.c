@@ -236,8 +236,12 @@ struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
     goto out_err;
   }
 
-  LOG(LL_INFO, ("I2C GPIO init ok (SDA: %d, SCL: %d, freq: %d)", c->sda_gpio,
-                c->scl_gpio, cfg->freq));
+  char b1[8], b2[8];
+  LOG(LL_INFO, ("I2C GPIO init ok (SDA: %s, SCL: %s, freq: %d)",
+                mgos_gpio_str(c->sda_gpio, b1), mgos_gpio_str(c->scl_gpio, b2),
+                cfg->freq));
+  (void) b1;
+  (void) b2;
 
   return c;
 

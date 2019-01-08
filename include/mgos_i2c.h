@@ -145,7 +145,10 @@ bool mgos_i2c_write_reg_n(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
 /* Close i2c connection and free resources. */
 void mgos_i2c_close(struct mgos_i2c *conn);
 
-/* Return i2c bus handle that is set up via the sysconfig. */
+/* Return bus object for the specified bus number. */
+struct mgos_i2c *mgos_i2c_get_bus(int bus_no);
+
+/* Return the default I2C bus. Equivalent to `mgos_i2c_get_bus(0)`. */
 struct mgos_i2c *mgos_i2c_get_global(void);
 
 /* Init given pins as OD outputs and perform bus reset

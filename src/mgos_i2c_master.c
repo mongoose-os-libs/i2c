@@ -20,7 +20,13 @@
 #include "mgos_gpio.h"
 #include "mgos_hal.h"
 
-static struct mgos_i2c *s_global_i2c;
+#ifndef MGOS_SYS_CONFIG_HAVE_I2C1
+#define NUM_BUSES 1
+#else
+#define NUM_BUSES 2
+#endif
+
+static struct mgos_i2c *s_buses[NUM_BUSES];
 
 int mgos_i2c_read_reg_b(struct mgos_i2c *conn, uint16_t addr, uint8_t reg) {
   uint8_t value;
@@ -70,13 +76,26 @@ bool mgos_i2c_write_reg_n(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
 }
 
 bool mgos_i2c_init(void) {
-  if (!mgos_sys_config_get_i2c_enable()) return true;
-  s_global_i2c = mgos_i2c_create(mgos_sys_config_get_i2c());
-  return (s_global_i2c != NULL);
+  if (mgos_sys_config_get_i2c_enable()) {
+    s_buses[0] = mgos_i2c_create(mgos_sys_config_get_i2c());
+    if (s_buses[0] == NULL) return false;
+  }
+#ifdef MGOS_SYS_CONFIG_HAVE_I2C1
+  if (mgos_sys_config_get_i2c1_enable()) {
+    s_buses[1] = mgos_i2c_create(mgos_sys_config_get_i2c1());
+    if (s_buses[1] == NULL) return false;
+  }
+#endif
+  return true;
+}
+
+struct mgos_i2c *mgos_i2c_get_bus(int bus_no) {
+  if (bus_no < 0 || bus_no >= (int) ARRAY_SIZE(s_buses)) return NULL;
+  return s_buses[bus_no];
 }
 
 struct mgos_i2c *mgos_i2c_get_global(void) {
-  return s_global_i2c;
+  return mgos_i2c_get_bus(0);
 }
 
 #define HALF_DELAY() (mgos_nsleep100)(100 / 2); /* 100 KHz */

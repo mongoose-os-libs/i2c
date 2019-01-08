@@ -10,18 +10,16 @@ sources:
 includes:
   - include
 
-config_schema:
-  - ["i2c", "o", {title: "I2C settings"}]
-  - ["i2c.enable", "b", false, {title: "Enable I2C"}]
-  - ["i2c.freq", "i", 100000, {title: "Clock frequency"}]
-  - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
-
 conds:
   - when: mos.platform == "cc3200"
     apply:
       sources:
         - src/cc32xx
       config_schema:
+        - ["i2c", "o", {title: "I2C settings"}]
+        - ["i2c.enable", "b", false, {title: "Enable I2C"}]
+        - ["i2c.freq", "i", 100000, {title: "Clock frequency"}]
+        - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
         - ["i2c.sda_pin", "i", 2, {title: "Pin to use for SDA"}]
         - ["i2c.scl_pin", "i", 1, {title: "Pin to use for SCL"}]
 
@@ -30,6 +28,10 @@ conds:
       sources:
         - src/cc32xx
       config_schema:
+        - ["i2c", "o", {title: "I2C settings"}]
+        - ["i2c.enable", "b", false, {title: "Enable I2C"}]
+        - ["i2c.freq", "i", 100000, {title: "Clock frequency"}]
+        - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
         - ["i2c.sda_pin", "i", 2, {title: "Pin to use for SDA"}]
         - ["i2c.scl_pin", "i", 1, {title: "Pin to use for SCL"}]
 
@@ -38,15 +40,30 @@ conds:
       sources:
         - src/esp32
       config_schema:
+        - ["i2c", "o", {title: "I2C settings"}]
         - ["i2c.unit_no", "i", 0, {title: "Which hardware unit to use, 0 or 1"}]
+        - ["i2c.enable", "b", false, {title: "Enable I2C"}]
+        - ["i2c.freq", "i", 100000, {title: "Clock frequency"}]
+        - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
         - ["i2c.sda_gpio", "i", 32, {title: "GPIO to use for SDA"}]
         - ["i2c.scl_gpio", "i", 33, {title: "GPIO to use for SCL"}]
+        - ["i2c1", "o", {title: "I2C settings"}]
+        - ["i2c1.unit_no", "i", 1, {title: "Which hardware unit to use, 0 or 1"}]
+        - ["i2c1.enable", "b", false, {title: "Enable I2C"}]
+        - ["i2c1.freq", "i", 100000, {title: "Clock frequency"}]
+        - ["i2c1.debug", "b", false, {title: "Debug I2C bus activity"}]
+        - ["i2c1.sda_gpio", "i", -1, {title: "GPIO to use for SDA"}]
+        - ["i2c1.scl_gpio", "i", -1, {title: "GPIO to use for SCL"}]
 
   - when: mos.platform == "esp8266"
     apply:
       sources:
         - src/gpio
       config_schema:
+        - ["i2c", "o", {title: "I2C settings"}]
+        - ["i2c.enable", "b", false, {title: "Enable I2C"}]
+        - ["i2c.freq", "i", 100000, {title: "Clock frequency"}]
+        - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
         - ["i2c.sda_gpio", "i", 12, {title: "GPIO to use for SDA"}]
         - ["i2c.scl_gpio", "i", 14, {title: "GPIO to use for SCL"}]
 
@@ -55,8 +72,13 @@ conds:
       sources:
         - src/gpio
       config_schema:
+        - ["i2c", "o", {title: "I2C settings"}]
+        - ["i2c.enable", "b", false, {title: "Enable I2C"}]
+        - ["i2c.freq", "i", 100000, {title: "Clock frequency"}]
+        - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
         - ["i2c.sda_gpio", "i", -1, {title: "GPIO to use for SDA"}]
         - ["i2c.scl_gpio", "i", -1, {title: "GPIO to use for SCL"}]
+        - ["i2c1", "i2c", {title: "I2C settings"}]
 
 tags:
   - c
