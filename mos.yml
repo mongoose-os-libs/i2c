@@ -47,13 +47,8 @@ conds:
         - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
         - ["i2c.sda_gpio", "i", 32, {title: "GPIO to use for SDA"}]
         - ["i2c.scl_gpio", "i", 33, {title: "GPIO to use for SCL"}]
-        - ["i2c1", "o", {title: "I2C settings"}]
-        - ["i2c1.unit_no", "i", 1, {title: "Which hardware unit to use, 0 or 1"}]
-        - ["i2c1.enable", "b", false, {title: "Enable I2C"}]
-        - ["i2c1.freq", "i", 100000, {title: "Clock frequency"}]
-        - ["i2c1.debug", "b", false, {title: "Debug I2C bus activity"}]
-        - ["i2c1.sda_gpio", "i", -1, {title: "GPIO to use for SDA"}]
-        - ["i2c1.scl_gpio", "i", -1, {title: "GPIO to use for SCL"}]
+        - ["i2c1", "i2c", {title: "I2C settings"}]
+        - ["i2c1.unit_no", 1]
 
   - when: mos.platform == "esp8266"
     apply:
