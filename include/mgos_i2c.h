@@ -142,6 +142,33 @@ bool mgos_i2c_write_reg_w(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
 bool mgos_i2c_write_reg_n(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
                           size_t n, const uint8_t *buf);
 
+/*
+ * Helper to set/get a number of bits in a register `reg` on a device at
+ * address `addr`.
+ * - bitoffset: 0..7 is the position at which to write `value`
+ * - bitlen   : number of bits to write
+ * - value    : the value to write there
+ *
+ * Invariants:
+ * - value must fit in `bitlen` (ie value < 2^bitlen)
+ * - bitlen+bitoffset <= register size (8 for reg_b, 16 for reg_w)
+ * - bitlen cannot be 0.
+ * - *conn cannot be NULL.
+ *
+ * The `setbits` call will write the bits to the register, the `getbits` call
+ * will return the value of those bits in *value.
+ *
+ * Returns `true` in case of success, `false` otherwise.
+ */
+bool mgos_i2c_setbits_reg_b(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
+                            uint8_t bitoffset, uint8_t bitlen, uint8_t value);
+bool mgos_i2c_getbits_reg_b(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
+                            uint8_t bitoffset, uint8_t bitlen, uint8_t *value);
+bool mgos_i2c_setbits_reg_w(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
+                            uint8_t bitoffset, uint8_t bitlen, uint16_t value);
+bool mgos_i2c_getbits_reg_w(struct mgos_i2c *conn, uint16_t addr, uint8_t reg,
+                            uint8_t bitoffset, uint8_t bitlen, uint16_t *value);
+
 /* Close i2c connection and free resources. */
 void mgos_i2c_close(struct mgos_i2c *conn);
 
