@@ -180,6 +180,7 @@ bool mgos_i2c_getbits_reg_b(struct mgos_i2c *i2c, uint16_t addr, uint8_t reg,
 bool mgos_i2c_setbits_reg_w(struct mgos_i2c *i2c, uint16_t addr, uint8_t reg,
                             uint8_t bitoffset, uint8_t bitlen, uint16_t value) {
   uint16_t old, new;
+  uint8_t d[2];
 
   if (!i2c || bitoffset + bitlen > 16 || bitlen == 0) {
     return false;
@@ -189,13 +190,16 @@ bool mgos_i2c_setbits_reg_w(struct mgos_i2c *i2c, uint16_t addr, uint8_t reg,
     return false;
   }
 
-  if (!mgos_i2c_read_reg_n(i2c, addr, reg, 2, (uint8_t *) &old)) {
+  if (!mgos_i2c_read_reg_n(i2c, addr, reg, 2, d)) {
     return false;
   }
 
+  old = (d[0] << 8) | d[1];
   new = old | (((1 << bitlen) - 1) << bitoffset);
   new &= ~(((1 << bitlen) - 1) << bitoffset);
   new |= (value) << bitoffset;
+  d[0] = new << 8;
+  d[1] = new & 0xFF;
 
   return mgos_i2c_write_reg_n(i2c, addr, reg, 2, (uint8_t *) &new);
 }
@@ -204,15 +208,17 @@ bool mgos_i2c_getbits_reg_w(struct mgos_i2c *i2c, uint16_t addr, uint8_t reg,
                             uint8_t bitoffset, uint8_t bitlen,
                             uint16_t *value) {
   uint16_t val, mask;
+  uint8_t d[2];
 
   if (!i2c || bitoffset + bitlen > 16 || bitlen == 0 || !value) {
     return false;
   }
 
-  if (!mgos_i2c_read_reg_n(i2c, addr, reg, 2, (uint8_t *) &val)) {
+  if (!mgos_i2c_read_reg_n(i2c, addr, reg, 2, d)) {
     return false;
   }
 
+  val = (d[0] << 8) | d[1];
   mask = ((1 << bitlen) - 1);
   mask <<= bitoffset;
   val &= mask;
