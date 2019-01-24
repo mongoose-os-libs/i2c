@@ -3,7 +3,7 @@ description: I2C support for Mongoose OS
 type: lib
 version: 1.0
 
-platforms: [ cc3200, cc3220, esp32, esp8266, stm32 ]
+platforms: [ cc3200, cc3220, esp32, esp8266, stm32, ubuntu ]
 
 sources:
   - src
@@ -74,6 +74,18 @@ conds:
         - ["i2c.sda_gpio", "i", -1, {title: "GPIO to use for SDA"}]
         - ["i2c.scl_gpio", "i", -1, {title: "GPIO to use for SCL"}]
         - ["i2c1", "i2c", {title: "I2C settings"}]
+
+  - when: mos.platform == "ubuntu"
+    apply:
+      sources:
+        - src/ubuntu
+      config_schema:
+        - ["i2c", "o", {title: "I2C settings"}]
+        - ["i2c.enable", "b", false, {title: "Enable I2C"}]
+        - ["i2c.unit_no", "i", 0, {title: "Which /dev/i2c-? to use"}]
+        - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
+        - ["i2c1", "i2c", {title: "I2C settings"}]
+        - ["i2c1.unit_no", 1]
 
 tags:
   - c
