@@ -19,6 +19,7 @@
 
 #include "mgos_gpio.h"
 #include "mgos_hal.h"
+#include "common/cs_dbg.h"
 
 #ifndef MGOS_SYS_CONFIG_HAVE_I2C1
 #define NUM_BUSES 1

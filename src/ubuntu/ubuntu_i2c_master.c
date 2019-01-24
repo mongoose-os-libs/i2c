@@ -67,8 +67,9 @@ bool mgos_i2c_write(struct mgos_i2c *c, uint16_t addr, const void *data, size_t 
     return false;
   }
   ret = write(c->fd, data, len);
+  if (c->cfg.debug)
+    LOG(LL_DEBUG, ("Sent %d bytes (wanted %lu) to 0x%02x on I2C%d bus", ret, len, addr, c->cfg.bus_no));
   if (ret != (int)len) {
-    LOG(LL_ERROR, ("Sent %d bytes (wanted %lu) to 0x%02x on I2C%d bus", ret, len, addr, c->cfg.bus_no));
     return false;
   }
 
@@ -106,8 +107,9 @@ bool mgos_i2c_read(struct mgos_i2c *c, uint16_t addr, void *data, size_t len, bo
   }
 
   ret = read(c->fd, data, len);
+  if (c->cfg.debug)
+    LOG(LL_DEBUG, ("Received %d bytes (wanted %lu) from 0x%02x on I2C%d bus", ret, len, addr, c->cfg.bus_no));
   if (ret != (int)len) {
-    LOG(LL_ERROR, ("Received %d bytes (wanted %lu) from 0x%02x on I2C%d bus", ret, len, addr, c->cfg.bus_no));
     return false;
   }
   return true;
@@ -152,9 +154,7 @@ struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
 
   c->fd = fd;
   c->read_timeout_ms = 150;
-  if (!mgos_i2c_set_freq(c, cfg->freq)) {
-    goto out_err;
-  }
+  c->freq = MGOS_I2C_FREQ_100KHZ;
 
   LOG(LL_INFO, ("I2C%d init ok (dev: %s, freq: %d)", c->cfg.bus_no, mgos_i2c_dev_filename(c), c->freq));
 
