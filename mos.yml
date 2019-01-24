@@ -82,8 +82,6 @@ conds:
       config_schema:
         - ["i2c", "o", {title: "I2C settings"}]
         - ["i2c.enable", "b", false, {title: "Enable I2C"}]
-        - ["i2c.freq", "i", 100000, {title: "Clock frequency"}]
-        - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
         - ["i2c.bus_no", "i", 0, {title: "Which /dev/i2c-? to use"}]
 
 tags:
