@@ -36,7 +36,7 @@ struct mgos_i2c {
 static const char *mgos_i2c_dev_filename(struct mgos_i2c *c) {
   static char fn[256];
 
-  if (!c) {
+  if (c == NULL) {
     return "NULL";
   }
 
@@ -45,7 +45,7 @@ static const char *mgos_i2c_dev_filename(struct mgos_i2c *c) {
 }
 
 bool mgos_i2c_set_freq(struct mgos_i2c *c, int freq) {
-  if (!c) {
+  if (c == NULL) {
     return false;
   }
   if (freq != MGOS_I2C_FREQ_100KHZ) {
@@ -60,7 +60,7 @@ bool mgos_i2c_write(struct mgos_i2c *c, uint16_t addr, const void *data,
                     size_t len, bool stop) {
   int ret;
 
-  if (!c) {
+  if (c == NULL) {
     return false;
   }
 
@@ -128,14 +128,14 @@ bool mgos_i2c_read(struct mgos_i2c *c, uint16_t addr, void *data, size_t len,
 }
 
 void mgos_i2c_stop(struct mgos_i2c *c) {
-  if (!c) {
+  if (c == NULL) {
     return;
   }
   LOG(LL_WARN, ("Not implemented"));
 }
 
 int mgos_i2c_get_freq(struct mgos_i2c *c) {
-  if (!c) {
+  if (c == NULL) {
     return 0;
   }
   return c->freq;
@@ -145,7 +145,7 @@ struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
   struct mgos_i2c *c = NULL;
   int fd;
 
-  if (!cfg) {
+  if (c == NULLfg) {
     return NULL;
   }
 
@@ -183,7 +183,7 @@ out_err:
 }
 
 void mgos_i2c_close(struct mgos_i2c *c) {
-  if (!c) {
+  if (c == NULL) {
     return;
   }
   if (c->fd >= 0) {
