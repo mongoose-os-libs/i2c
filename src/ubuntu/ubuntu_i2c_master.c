@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
+#include <linux/i2c-dev.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/select.h>
 #include <sys/ioctl.h>
-#include <linux/i2c-dev.h>
+#include <sys/select.h>
+#include <unistd.h>
+#include "common/cs_dbg.h"
 #include "mgos_i2c.h"
 #include "ubuntu_ipc.h"
-#include "common/cs_dbg.h"
 
 struct mgos_i2c {
   struct mgos_config_i2c cfg;
-  int                    freq;
-  int                    read_timeout_ms;
-  int                    fd;
-  int                    dev_no;
+  int freq;
+  int read_timeout_ms;
+  int fd;
+  int dev_no;
 };
 
 static const char *mgos_i2c_dev_filename(struct mgos_i2c *c) {
@@ -41,7 +41,7 @@ static const char *mgos_i2c_dev_filename(struct mgos_i2c *c) {
   }
 
   snprintf(fn, sizeof(fn) - 1, "/dev/i2c-%d", c->cfg.dev_no);
-  return (const char *)fn;
+  return (const char *) fn;
 }
 
 bool mgos_i2c_set_freq(struct mgos_i2c *c, int freq) {
@@ -56,7 +56,8 @@ bool mgos_i2c_set_freq(struct mgos_i2c *c, int freq) {
   return true;
 }
 
-bool mgos_i2c_write(struct mgos_i2c *c, uint16_t addr, const void *data, size_t len, bool stop) {
+bool mgos_i2c_write(struct mgos_i2c *c, uint16_t addr, const void *data,
+                    size_t len, bool stop) {
   int ret;
 
   if (!c) {
@@ -64,60 +65,66 @@ bool mgos_i2c_write(struct mgos_i2c *c, uint16_t addr, const void *data, size_t 
   }
 
   if (ioctl(c->fd, I2C_SLAVE, addr) < 0) {
-    LOG(LL_ERROR, ("Cannot select slave 0x%02x on I2C bus %s", addr, mgos_i2c_dev_filename(c)));
+    LOG(LL_ERROR, ("Cannot select slave 0x%02x on I2C bus %s", addr,
+                   mgos_i2c_dev_filename(c)));
     return false;
   }
   ret = write(c->fd, data, len);
   if (c->cfg.debug) {
-    LOG(LL_DEBUG, ("Sent %d bytes (wanted %lu) to 0x%02x on I2C bus %s", ret, len, addr, mgos_i2c_dev_filename(c)));
+    LOG(LL_DEBUG, ("Sent %d bytes (wanted %lu) to 0x%02x on I2C bus %s", ret,
+                   len, addr, mgos_i2c_dev_filename(c)));
   }
-  if (ret != (int)len) {
+  if (ret != (int) len) {
     return false;
   }
 
   return true;
 
-  (void)stop;
+  (void) stop;
 }
 
-bool mgos_i2c_read(struct mgos_i2c *c, uint16_t addr, void *data, size_t len, bool stop) {
-  fd_set         rfds;
+bool mgos_i2c_read(struct mgos_i2c *c, uint16_t addr, void *data, size_t len,
+                   bool stop) {
+  fd_set rfds;
   struct timeval tv;
-  int            ret;
+  int ret;
 
   if (!c) {
     return false;
   }
 
   if (ioctl(c->fd, I2C_SLAVE, addr) < 0) {
-    LOG(LL_ERROR, ("Cannot select slave 0x%02x on I2C bus %s", addr, mgos_i2c_dev_filename(c)));
+    LOG(LL_ERROR, ("Cannot select slave 0x%02x on I2C bus %s", addr,
+                   mgos_i2c_dev_filename(c)));
     return false;
   }
 
   FD_ZERO(&rfds);
   FD_SET(c->fd, &rfds);
 
-  tv.tv_sec  = 0;
+  tv.tv_sec = 0;
   tv.tv_usec = c->read_timeout_ms * 1000;
-  ret        = select(FD_SETSIZE, &rfds, NULL, NULL, &tv);
+  ret = select(FD_SETSIZE, &rfds, NULL, NULL, &tv);
   if (ret < 0) {
     LOG(LL_ERROR, ("Cannot not select(): %s", strerror(errno)));
     return false;
   } else if (ret == 0) {
-    LOG(LL_ERROR, ("Read timeout (%dms) from slave 0x%02x on I2C bus %s", c->read_timeout_ms, addr, mgos_i2c_dev_filename(c)));
+    LOG(LL_ERROR, ("Read timeout (%dms) from slave 0x%02x on I2C bus %s",
+                   c->read_timeout_ms, addr, mgos_i2c_dev_filename(c)));
     return false;
   }
 
   ret = read(c->fd, data, len);
   if (c->cfg.debug) {
-    LOG(LL_DEBUG, ("Received %d bytes (wanted %lu) from 0x%02x on I2C bus %s", ret, len, addr, mgos_i2c_dev_filename(c)));
+    LOG(LL_DEBUG, ("Received %d bytes (wanted %lu) from 0x%02x on I2C bus %s",
+                   ret, len, addr, mgos_i2c_dev_filename(c)));
   }
-  if (ret != (int)len) {
+  if (ret != (int) len) {
     return false;
   }
   return true;
 
-  (void)stop;
+  (void) stop;
 }
 
 void mgos_i2c_stop(struct mgos_i2c *c) {
@@ -157,9 +164,10 @@ struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
 
   c->fd = fd;
   c->read_timeout_ms = 150;
-  c->freq            = MGOS_I2C_FREQ_100KHZ;
+  c->freq = MGOS_I2C_FREQ_100KHZ;
 
-  LOG(LL_INFO, ("I2C init ok (dev: %s, freq: %d)", mgos_i2c_dev_filename(c), c->freq));
+  LOG(LL_INFO,
+      ("I2C init ok (dev: %s, freq: %d)", mgos_i2c_dev_filename(c), c->freq));
 
   return c;
 
