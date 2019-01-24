@@ -145,7 +145,7 @@ struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
   struct mgos_i2c *c = NULL;
   int fd;
 
-  if (c == NULL) {
+  if (cfg == NULL) {
     return NULL;
   }
 
