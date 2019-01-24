@@ -89,7 +89,7 @@ bool mgos_i2c_read(struct mgos_i2c *c, uint16_t addr, void *data, size_t len,
   struct timeval tv;
   int ret;
 
-  if (!c) {
+  if (c == NULL) {
     return false;
   }
 
@@ -175,7 +175,7 @@ out_err:
   if (c) {
     free(c);
   }
-  if (fd > 0) {
+  if (fd >= 0) {
     close(fd);
   }
   LOG(LL_ERROR, ("Invalid I2C settings"));
@@ -186,7 +186,7 @@ void mgos_i2c_close(struct mgos_i2c *c) {
   if (!c) {
     return;
   }
-  if (c->fd > 0) {
+  if (c->fd >= 0) {
     close(c->fd);
   }
   free(c);
