@@ -83,7 +83,7 @@ conds:
         - ["i2c", "o", {title: "I2C settings"}]
         - ["i2c.enable", "b", false, {title: "Enable I2C"}]
         - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
-        - ["i2c.bus_no", "i", 0, {title: "Which /dev/i2c-? to use"}]
+        - ["i2c.dev_no", "i", 0, {title: "Which /dev/i2c-? to use"}]
 
 tags:
   - c

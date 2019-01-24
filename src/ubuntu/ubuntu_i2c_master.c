@@ -30,6 +30,7 @@ struct mgos_i2c {
   int                    freq;
   int                    read_timeout_ms;
   int                    fd;
+  int                    dev_no;
 };
 
 static const char *mgos_i2c_dev_filename(struct mgos_i2c *c) {
@@ -39,7 +40,7 @@ static const char *mgos_i2c_dev_filename(struct mgos_i2c *c) {
     return "NULL";
   }
 
-  snprintf(fn, sizeof(fn) - 1, "/dev/i2c-%d", c->cfg.bus_no);
+  snprintf(fn, sizeof(fn) - 1, "/dev/i2c-%d", c->cfg.dev_no);
   return (const char *)fn;
 }
 
@@ -63,12 +64,13 @@ bool mgos_i2c_write(struct mgos_i2c *c, uint16_t addr, const void *data, size_t 
   }
 
   if (ioctl(c->fd, I2C_SLAVE, addr) < 0) {
-    LOG(LL_ERROR, ("Cannot select slave 0x%02x on I2C%d bus", addr, c->cfg.bus_no));
+    LOG(LL_ERROR, ("Cannot select slave 0x%02x on I2C bus %s", addr, mgos_i2c_dev_filename(c)));
     return false;
   }
   ret = write(c->fd, data, len);
-  if (c->cfg.debug)
-    LOG(LL_DEBUG, ("Sent %d bytes (wanted %lu) to 0x%02x on I2C%d bus", ret, len, addr, c->cfg.bus_no));
+  if (c->cfg.debug) {
+    LOG(LL_DEBUG, ("Sent %d bytes (wanted %lu) to 0x%02x on I2C bus %s", ret, len, addr, mgos_i2c_dev_filename(c)));
+  }
   if (ret != (int)len) {
     return false;
   }
@@ -88,7 +90,7 @@ bool mgos_i2c_read(struct mgos_i2c *c, uint16_t addr, void *data, size_t len, bo
   }
 
   if (ioctl(c->fd, I2C_SLAVE, addr) < 0) {
-    LOG(LL_ERROR, ("Cannot select slave 0x%02x on I2C%d bus", addr, c->cfg.bus_no));
+    LOG(LL_ERROR, ("Cannot select slave 0x%02x on I2C bus %s", addr, mgos_i2c_dev_filename(c)));
     return false;
   }
 
@@ -102,13 +104,14 @@ bool mgos_i2c_read(struct mgos_i2c *c, uint16_t addr, void *data, size_t len, bo
     LOG(LL_ERROR, ("Cannot not select(): %s", strerror(errno)));
     return false;
   } else if (ret == 0) {
-    LOG(LL_ERROR, ("Read timeout (%dms) from slave 0x%02x on I2C%d bus", c->read_timeout_ms, addr, c->cfg.bus_no));
+    LOG(LL_ERROR, ("Read timeout (%dms) from slave 0x%02x on I2C bus %s", c->read_timeout_ms, addr, mgos_i2c_dev_filename(c)));
     return false;
   }
 
   ret = read(c->fd, data, len);
-  if (c->cfg.debug)
-    LOG(LL_DEBUG, ("Received %d bytes (wanted %lu) from 0x%02x on I2C%d bus", ret, len, addr, c->cfg.bus_no));
+  if (c->cfg.debug) {
+    LOG(LL_DEBUG, ("Received %d bytes (wanted %lu) from 0x%02x on I2C bus %s", ret, len, addr, mgos_i2c_dev_filename(c)));
+  }
   if (ret != (int)len) {
     return false;
   }
@@ -154,9 +157,9 @@ struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
 
   c->fd = fd;
   c->read_timeout_ms = 150;
-  c->freq = MGOS_I2C_FREQ_100KHZ;
+  c->freq            = MGOS_I2C_FREQ_100KHZ;
 
-  LOG(LL_INFO, ("I2C%d init ok (dev: %s, freq: %d)", c->cfg.bus_no, mgos_i2c_dev_filename(c), c->freq));
+  LOG(LL_INFO, ("I2C init ok (dev: %s, freq: %d)", mgos_i2c_dev_filename(c), c->freq));
 
   return c;
 
