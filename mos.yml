@@ -49,6 +49,9 @@ conds:
         - ["i2c.scl_gpio", "i", 33, {title: "GPIO to use for SCL"}]
         - ["i2c1", "i2c", {title: "I2C settings"}]
         - ["i2c1.unit_no", 1]
+        - ["i2c1.enable", false]
+        - ["i2c1.sda_gpio", 22]
+        - ["i2c1.scl_gpio", 23]
 
   - when: mos.platform == "esp8266"
     apply:
@@ -74,6 +77,7 @@ conds:
         - ["i2c.sda_gpio", "i", -1, {title: "GPIO to use for SDA"}]
         - ["i2c.scl_gpio", "i", -1, {title: "GPIO to use for SCL"}]
         - ["i2c1", "i2c", {title: "I2C settings"}]
+        - ["i2c1.enable", false]
 
   - when: mos.platform == "ubuntu"
     apply:
@@ -86,6 +90,7 @@ conds:
         - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
         - ["i2c1", "i2c", {title: "I2C settings"}]
         - ["i2c1.unit_no", 1]
+        - ["i2c1.enable", false]
 
 tags:
   - c
