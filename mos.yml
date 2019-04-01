@@ -3,7 +3,7 @@ description: I2C support for Mongoose OS
 type: lib
 version: 1.0
 
-platforms: [ cc3200, cc3220, esp32, esp8266, stm32, ubuntu ]
+platforms: [ cc3200, cc3220, esp32, esp8266, rs14100, stm32, ubuntu ]
 
 sources:
   - src
