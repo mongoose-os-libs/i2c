@@ -75,11 +75,13 @@ conds:
         - ["i2c.unit_no", "i", 1, {title: "Which hardware unit to use, 1, 2 or 3 (ULP)"}]
         - ["i2c.freq", "i", 100000, {title: "Clock frequency"}]
         - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
-        - ["i2c.sda_gpio", "i", -1, {title: "GPIO to use for SDA"}]
-        - ["i2c.scl_gpio", "i", -1, {title: "GPIO to use for SCL"}]
+        - ["i2c.sda_gpio", "i", 51, {title: "GPIO to use for SDA"}]
+        - ["i2c.scl_gpio", "i", 50, {title: "GPIO to use for SCL"}]
         - ["i2c1", "i2c", {title: "I2C settings"}]
         - ["i2c1.enable", false]
         - ["i2c1.unit_no", 2]
+        - ["i2c1.sda_gpio", 41]
+        - ["i2c1.scl_gpio", 40]
 
   - when: mos.platform == "stm32"
     apply:
