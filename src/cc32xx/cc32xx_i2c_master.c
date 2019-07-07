@@ -20,6 +20,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// clang-format off
 #include "inc/hw_types.h"
 #include "inc/hw_i2c.h"
 #include "inc/hw_memmap.h"
@@ -28,6 +29,7 @@
 #include "driverlib/prcm.h"
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
+// clang-format on
 
 #include "common/cs_dbg.h"
 
