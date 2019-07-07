@@ -23,7 +23,11 @@
 #ifndef MGOS_SYS_CONFIG_HAVE_I2C1
 #define NUM_BUSES 1
 #else
+#ifndef MGOS_SYS_CONFIG_HAVE_I2C2
 #define NUM_BUSES 2
+#else
+#define NUM_BUSES 3
+#endif
 #endif
 
 static struct mgos_i2c *s_buses[NUM_BUSES];
@@ -84,6 +88,12 @@ bool mgos_i2c_init(void) {
   if (mgos_sys_config_get_i2c1_enable()) {
     s_buses[1] = mgos_i2c_create(mgos_sys_config_get_i2c1());
     if (s_buses[1] == NULL) return false;
+  }
+#endif
+#ifdef MGOS_SYS_CONFIG_HAVE_I2C2
+  if (mgos_sys_config_get_i2c2_enable()) {
+    s_buses[2] = mgos_i2c_create(mgos_sys_config_get_i2c2());
+    if (s_buses[2] == NULL) return false;
   }
 #endif
   return true;

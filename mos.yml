@@ -96,6 +96,8 @@ conds:
         - ["i2c.scl_gpio", "i", -1, {title: "GPIO to use for SCL"}]
         - ["i2c1", "i2c", {title: "I2C settings"}]
         - ["i2c1.enable", false]
+        - ["i2c2", "i2c", {title: "I2C settings"}]
+        - ["i2c2.enable", false]
 
   - when: mos.platform == "ubuntu"
     apply:
