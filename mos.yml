@@ -64,6 +64,11 @@ conds:
         - ["i2c.debug", "b", false, {title: "Debug I2C bus activity"}]
         - ["i2c.sda_gpio", "i", 12, {title: "GPIO to use for SDA"}]
         - ["i2c.scl_gpio", "i", 14, {title: "GPIO to use for SCL"}]
+        - ["i2c1", "i2c", {title: "I2C settings"}]
+        - ["i2c1.enable", false]
+        - ["i2c1.freq", 100000]
+        - ["i2c1.sda_gpio", 4]
+        - ["i2c1.scl_gpio", 5]
 
   - when: mos.platform == "rs14100"
     apply:
