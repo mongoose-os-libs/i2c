@@ -208,10 +208,8 @@ bool mgos_i2c_setbits_reg_w(struct mgos_i2c *i2c, uint16_t addr, uint8_t reg,
   new = old | (((1 << bitlen) - 1) << bitoffset);
   new &= ~(((1 << bitlen) - 1) << bitoffset);
   new |= (value) << bitoffset;
-  d[0] = new << 8;
-  d[1] = new & 0xFF;
-
-  return mgos_i2c_write_reg_n(i2c, addr, reg, 2, (uint8_t *) &new);
+  
+  return mgos_i2c_write_reg_w(i2c, addr, reg, new);
 }
 
 bool mgos_i2c_getbits_reg_w(struct mgos_i2c *i2c, uint16_t addr, uint8_t reg,
