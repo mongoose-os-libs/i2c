@@ -70,8 +70,8 @@ bool mgos_i2c_write(struct mgos_i2c *c, uint16_t addr, const void *data,
   }
   ret = write(c->fd, data, len);
   if (c->cfg.debug) {
-    LOG(LL_DEBUG, ("Sent %d bytes (wanted %zu) to 0x%02x on I2C bus %s", ret,
-                   len, addr, mgos_i2c_dev_filename(c)));
+    LOG(LL_DEBUG, ("Sent %d bytes (wanted %lu) to 0x%02x on I2C bus %s", ret,
+                   (unsigned long) len, addr, mgos_i2c_dev_filename(c)));
   }
   if (ret != (int) len) {
     return false;
@@ -115,8 +115,8 @@ bool mgos_i2c_read(struct mgos_i2c *c, uint16_t addr, void *data, size_t len,
 
   ret = read(c->fd, data, len);
   if (c->cfg.debug) {
-    LOG(LL_DEBUG, ("Received %d bytes (wanted %zu) from 0x%02x on I2C bus %s",
-                   ret, len, addr, mgos_i2c_dev_filename(c)));
+    LOG(LL_DEBUG, ("Received %d bytes (wanted %lu) from 0x%02x on I2C bus %s",
+                   ret, (unsigned long) len, addr, mgos_i2c_dev_filename(c)));
   }
   if (ret != (int) len) {
     return false;
