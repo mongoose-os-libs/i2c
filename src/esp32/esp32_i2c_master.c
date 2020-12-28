@@ -19,19 +19,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "mgos.h"
 #include "mgos_i2c.h"
 
 #include "driver/gpio.h"
 #include "driver/periph_ctrl.h"
-#include "esp_attr.h"
 #include "soc/gpio_sig_map.h"
 #include "soc/i2c_reg.h"
 #include "soc/i2c_struct.h"
-
-#include "mgos_sys_config.h"
-#include "mgos_system.h"
-
-#include "common/cs_dbg.h"
 
 #define I2C_COMMAND_OP_RSTART (0 << 11)
 #define I2C_COMMAND_OP_WRITE (1 << 11)
@@ -128,10 +123,7 @@ static bool esp32_i2c_reset(struct mgos_i2c *c, int new_freq) {
   gpio_matrix_out(c->cfg.sda_gpio, SIG_GPIO_OUT_IDX, false /* out_inv */,
                   false /* oen_inv */);
 
-  periph_module_disable(c->pm);
-  mgos_msleep(1);
-  periph_module_enable(c->pm);
-  mgos_msleep(1);
+  periph_module_reset(c->pm);
 
   dev->ctr.val = 0;
   /* MSB first for RX and TX */
@@ -374,6 +366,8 @@ struct mgos_i2c *mgos_i2c_create(const struct mgos_config_i2c *cfg) {
   }
   c->debug = cfg->debug;
 
+  periph_module_enable(c->pm);
+
   if (!esp32_i2c_reset(c, cfg->freq)) goto out_err;
 
   esp_err_t r = 0;
@@ -410,6 +404,7 @@ out_err:
 }
 
 void mgos_i2c_close(struct mgos_i2c *c) {
+  periph_module_disable(c->pm);
   mgos_i2c_stop(c);
   free(c);
 }
